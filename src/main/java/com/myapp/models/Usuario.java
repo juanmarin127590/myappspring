@@ -1,12 +1,18 @@
 package com.myapp.models;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 // Anotación para indicar que esta clase es una entidad persistente
@@ -54,6 +60,15 @@ public class Usuario {
         this.telefono = telefono;
     }
 
+    // Relación Many-to-Many con Roles
+    @ManyToMany(fetch = FetchType.EAGER) // Carga EAGER para obtener roles al cargar el usuario (útil para seguridad)
+    @JoinTable(
+        name = "UsuarioRoles", // Nombre de la tabla intermedia en la BD
+        joinColumns = @JoinColumn(name = "id_usuario"), // Columna de esta entidad (Usuario)
+        inverseJoinColumns = @JoinColumn(name = "id_rol") // Columna de la entidad relacionada (Rol)
+    )
+    private Set<Roles> roles = new HashSet<>();
+
     // Getters y Setters
     public Long getIdUsuario() {return idUsuario; }
     public void setIdUsuario(Long idUsuario) {this.idUsuario = idUsuario;}
@@ -70,5 +85,7 @@ public class Usuario {
     public LocalDateTime getFechaRegistro() {return fechaRegistro;}
     public Boolean getActivo() {return activo;}
     public void setActivo(Boolean activo) {this.activo = activo;}
+    public Set<Roles> getRoles() { return roles; }
+    public void setRoles(Set<Roles> roles) { this.roles = roles; }
 
 }
