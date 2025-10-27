@@ -1,27 +1,52 @@
 package com.myapp.services;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.myapp.models.Rol;
 import com.myapp.models.Usuario;
+import com.myapp.repositories.RolRepository;
 import com.myapp.repositories.UsuarioRepository;
 
 @Service
 public class UsuarioServices {
 
-    @Autowired
     private UsuarioRepository usuarioRepository;
+    private RolRepository rolRepository;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UsuarioServices(UsuarioRepository usuarioRepository, RolRepository rolRepository,
+            PasswordEncoder passwordEncoder) {
+        this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     // 1. Crear un nuevo usuario
-    public Usuario crearUsuario(Usuario usuario) {
-        // Lógica de negocio: Por ejemplo, encriptar la contraseña (requeriría un
-        // BCryptPasswordEncoder)
-        // if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
-        // throw new RuntimeException("El email ya está registrado.");
-        // }
-        // usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+    public Usuario registrarNuevoCliente(Usuario usuario) {
+        // 1. Verificación del email (Lógica de Negocio)
+        if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
+            throw new RuntimeException("El email ya está registrado: " + usuario.getEmail());
+        }
+        
+        //2. Encriptar la contraseña antes de guardar
+        String hashedPassword = passwordEncoder.encode(usuario.getPassword());
+        usuario.setPassword(hashedPassword);
 
+        // 3. Asignar rol por defecto (Lógica de Negocio)
+        Rol clienteRol = rolRepository.findByNombreRol("CLIENTE")
+                .orElseThrow(() -> new RuntimeException("Rol 'CLIENTE' no encontrado. Ejecute el DataSeeder."));
+
+        // Usar Collections.singleton para crear un Set inmutable con un solo elemento
+        usuario.setRoles(Collections.singleton(clienteRol));        
+
+        // 4. Persistencia
         return usuarioRepository.save(usuario);
     }
 
@@ -34,7 +59,6 @@ public class UsuarioServices {
     public Optional<Usuario> obtenerUsuarioPorId(Long id) {
         return usuarioRepository.findById(id);
     }
-
 
     // 4. Actualizar un usuario existente
     public Usuario actualizarUsuario(Long id, Usuario detalleUsuario) {
@@ -59,7 +83,7 @@ public class UsuarioServices {
             usuarioExistente.setActivo(false);
             usuarioRepository.save(usuarioExistente);
         } else {
-            throw new RuntimeException("Usuario no encontrado con ID: " + id);      
+            throw new RuntimeException("Usuario no encontrado con ID: " + id);
         }
     }
 

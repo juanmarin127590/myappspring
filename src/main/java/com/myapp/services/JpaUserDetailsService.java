@@ -21,6 +21,7 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Método principal requerido por Spring Security para la autenticación
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // 1. Buscar Usuario por email (username en este contexto)

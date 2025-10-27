@@ -15,60 +15,64 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @Controller
 @RequestMapping("/api/usuario")
 public class UsuarioController {
 
     @Autowired
-    private UsuarioServices usuarioServices;
+    private UsuarioServices usuarioService;
 
     // POST: /api/usuario
     @PostMapping
-    public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) {
-            // El método save es transaccional por defecto en Spring Data JPA
-            Usuario nuevoUsuario = usuarioServices.crearUsuario(usuario);
+    public ResponseEntity<Usuario> registrarUsuario(@RequestBody Usuario usuario) {
+        try {
+            Usuario nuevoUsuario = usuarioService.registrarNuevoCliente(usuario);
+            // NOTA: Es una buena práctica no devolver el campo 'password' en la respuesta.
+            // Esto se lograría usando un DTO (Data Transfer Object), que es un paso futuro.
+            return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            // Manejo de error de negocio (ej. Email ya existe)
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
-            return new ResponseEntity<> (nuevoUsuario, HttpStatus.CREATED);
-        
     }
 
     // GET: /api/usuario
     @GetMapping
     public ResponseEntity<List<Usuario>> obtenerTodosLosUsuarios() {
-            List<Usuario> listaUsuarios = usuarioServices.obtenerTodosLosUsuarios();
-            return new ResponseEntity<> (listaUsuarios, HttpStatus.OK); // Devuelve 200 OK
+        List<Usuario> listaUsuarios = usuarioService.obtenerTodosLosUsuarios();
+        return new ResponseEntity<>(listaUsuarios, HttpStatus.OK); // Devuelve 200 OK
     }
 
     // GET: /api/usuario/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
-            return usuarioServices.obtenerUsuarioPorId(id)
-                    .map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK)) // Si existe, devuelve 200 OK
-                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));  // Si no existe, devuelve 404 Not Found  
+        return usuarioService.obtenerUsuarioPorId(id)
+                .map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK)) // Si existe, devuelve 200 OK
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND)); // Si no existe, devuelve 404 Not Found
     }
 
     // PUT: /api/usuario/{id}
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario detalleUsuario) {
-            try {
-                Usuario usuarioActualizado = usuarioServices.actualizarUsuario(id, detalleUsuario);
-                return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK); // Devuelve 200 OK
-            } catch (RuntimeException e) {
-                // Manejo básico de excepción (404 Not Found)
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Devuelve 404 Not Found si no existe
-            }
+        try {
+            Usuario usuarioActualizado = usuarioService.actualizarUsuario(id, detalleUsuario);
+            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK); // Devuelve 200 OK
+        } catch (RuntimeException e) {
+            // Manejo básico de excepción (404 Not Found)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Devuelve 404 Not Found si no existe
+        }
     }
 
     // DELETE: /api/usuario/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
-            try {
-                usuarioServices.eliminarUsuario(id);
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Devuelve 204 No Content
-            } catch (RuntimeException e) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Devuelve 404 Not Found si no existe
-            }
+        try {
+            usuarioService.eliminarUsuario(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Devuelve 204 No Content
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Devuelve 404 Not Found si no existe
         }
+    }
 
 }

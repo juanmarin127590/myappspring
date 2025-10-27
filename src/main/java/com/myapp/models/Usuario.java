@@ -3,7 +3,7 @@ package com.myapp.models;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -67,7 +67,7 @@ public class Usuario {
         joinColumns = @JoinColumn(name = "id_usuario"), // Columna de esta entidad (Usuario)
         inverseJoinColumns = @JoinColumn(name = "id_rol") // Columna de la entidad relacionada (Rol)
     )
-    private Set<Roles> roles = new HashSet<>();
+    private Set<Rol> roles = new HashSet<>();
 
     // Getters y Setters
     public Long getIdUsuario() {return idUsuario; }
@@ -85,7 +85,7 @@ public class Usuario {
     public LocalDateTime getFechaRegistro() {return fechaRegistro;}
     public Boolean getActivo() {return activo;}
     public void setActivo(Boolean activo) {this.activo = activo;}
-    public Set<Roles> getRoles() { return roles; }
-    public void setRoles(Set<Roles> roles) { this.roles = roles; }
+    public Set<Rol> getRoles() { return roles; }
+    public void setRoles(Set<Rol> roles) { this.roles = roles; }
 
 }

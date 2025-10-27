@@ -3,6 +3,10 @@ package com.myapp.models;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,8 +17,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Roles")
-public class Roles {
-    
+public class Rol {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idRol;
@@ -25,30 +29,35 @@ public class Roles {
 
     // Relación ManyToMany con Usuario:
     // MappedBy indica que la tabla Usuario es dueña de la relación
+   @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     // Usamos Set para evitar duplicados y mejorar el rendimiento de búsqueda
     private Set<Usuario> usuarios = new HashSet<>();
 
+    public Rol() {
+    }
 
-    public Roles() {}
-
-    public Roles(String nombreRol) {
+    public Rol(String nombreRol) {
         this.nombreRol = nombreRol;
     }
-    
+
     // --- Getters y Setters ---
     public Integer getIdRol() {
         return idRol;
     }
+
     public void setIdRol(Integer idRol) {
         this.idRol = idRol;
     }
+
     public String getNombreRol() {
         return nombreRol;
     }
+
     public void setNombreRol(String nombreRol) {
         this.nombreRol = nombreRol;
     }
+
     public Set<Usuario> getUsuarios() {
         return usuarios;
     }
