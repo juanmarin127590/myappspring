@@ -3,6 +3,9 @@ package com.myapp.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +17,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Categorias")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "productos"})
 public class Categoria {
 
 
@@ -29,6 +33,7 @@ public class Categoria {
     private String descripcion;
 
     // Relación Uno-a-Muchos con Productos (El 'mappedBy' indica el dueño de la relación)
+    @JsonIgnore
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Producto> producto = new ArrayList<>();
     

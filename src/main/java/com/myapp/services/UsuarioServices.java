@@ -3,11 +3,8 @@ package com.myapp.services;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.myapp.models.Rol;
 import com.myapp.models.Usuario;
 import com.myapp.repositories.RolRepository;
@@ -20,7 +17,7 @@ public class UsuarioServices {
     private RolRepository rolRepository;
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
+
     public UsuarioServices(UsuarioRepository usuarioRepository, RolRepository rolRepository,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;

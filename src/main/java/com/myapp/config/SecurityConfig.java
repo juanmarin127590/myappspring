@@ -37,16 +37,28 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Deshabilita CSRF para APIs REST sin estado (Stateless)
                 .authorizeHttpRequests(authorize -> authorize
-                        // Permite el acceso sin autenticación a la consola H2
+                        // 1. Permite el acceso sin autenticación a la consola H2
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
 
                         // 2. REGISTRO PÚBLICO (POST): Permite a cualquier persona crear un usuario
                         // (Registro)
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/usuario")).permitAll()
 
-                        // 3. CRUD RESTRICTIVO: GET, PUT, DELETE para /api/usuarios/** requieren
+                       // 3. ENDPOINTS PÚBLICOS DE CATÁLOGO (Categorías y Productos)
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/categorias")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/categorias/**")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos/**")).permitAll()
+
+                        // 4. CRUD RESTRICTIVO: GET, PUT, DELETE para /api/usuarios/** requieren
                         // ADMINISTRADOR
-                        // Incluye GET /api/usuarios y GET /api/usuarios/{id}
+                        // ENDPOINTS ADMINISTRATIVOS (usuario/Categorías) - CRUD
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/categorias"))
+                        .hasRole("ADMINISTRADOR")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/categorias/**"))
+                        .hasRole("ADMINISTRADOR")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/categorias/**"))
+                        .hasRole("ADMINISTRADOR")
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/usuario/**"))
                         .hasRole("ADMINISTRADOR")
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/usuario/**"))
@@ -59,7 +71,6 @@ public class SecurityConfig {
                 // Habilita la autenticación básica
                 .httpBasic(httpBasic -> {
                 })
-
                 // Configuración para permitir el iframe de la consola H2
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
