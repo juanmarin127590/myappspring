@@ -50,24 +50,23 @@ public class SecurityConfig {
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos/**")).permitAll()
 
-                        // 4. CRUD RESTRICTIVO: GET, PUT, DELETE para /api/usuarios/** requieren
-                        // ADMINISTRADOR
-                        // ENDPOINTS ADMINISTRATIVOS (usuario/Categorías) - CRUD
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/categorias"))
-                        .hasRole("ADMINISTRADOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/categorias/**"))
-                        .hasRole("ADMINISTRADOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/categorias/**"))
-                        .hasRole("ADMINISTRADOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/usuario/**"))
-                        .hasRole("ADMINISTRADOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/usuario/**"))
-                        .hasRole("ADMINISTRADOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/usuario/**"))
-                        .hasRole("ADMINISTRADOR")
 
-                        // 4. Todas las demás peticiones requieren autenticación
+                        // ADMINISTRADOR
+                        // 4. ENDPOINTS ADMINISTRATIVOS (Categorías) - CRUD
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/categorias/**")).hasRole("ADMINISTRADOR")
+                        
+                       // 5. ENDPOINTS ADMINISTRATIVOS (Productos) - CRUD + Listar todos
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/productos/admin")).hasRole("ADMINISTRADOR")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/productos")).hasRole("ADMINISTRADOR")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/productos/**")).hasRole("ADMINISTRADOR")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/productos/**")).hasRole("ADMINISTRADOR")
+
+                       // 6. Acciones de Administrador (Usuarios) - CRUD
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/usuarios/**")).hasRole("ADMINISTRADOR")
+
+                       // 7. Todas las demás peticiones requieren autenticación
                         .anyRequest().authenticated())
+                        
                 // Habilita la autenticación básica
                 .httpBasic(httpBasic -> {
                 })
