@@ -45,18 +45,18 @@ public class SecurityConfig {
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/usuario")).permitAll()
 
                        // 3. ENDPOINTS PÚBLICOS DE CATÁLOGO (Categorías y Productos)
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/categorias")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/categorias/**")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos/**")).permitAll()
 
-                        // 4. ENDPOINTS DE USUARIO AUTENTICADO (Gestión de Direcciones)
-
-                        // Cualquier usuario autenticado puede gestionar SUS propias direcciones (CRUD)
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones")).authenticated()
+                        // 4. ENDPOINTS DE USUARIO AUTENTICADO
+                        // Gestión de Direcciones (CRUD)
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/**")).authenticated()
+                
+                        // Gestión de Pedidos (CRUD) - USUARIO AUTENTICADO
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos")).authenticated() // POST y GET de historial
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/**")).authenticated() // GET detalle, PUT cancelar
 
-                        // 5. ENDPOINTS ADMINISTRATIVOS (Acceso global)
+                        // 5. ENDPOINTS ADMINISTRATIVOS (ROLE_ADMINISTRADOR)
                         // La gestión administrativa de cualquier recurso debe ser para ROLE_ADMINISTRADOR
 
                         //Categorías
@@ -70,6 +70,9 @@ public class SecurityConfig {
 
                         // Direcciones (Administrador)
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/admin/**")).hasRole("ADMINISTRADOR")
+
+                        // Pedidos (Administrador) - Listar todos y actualizar estado
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/admin/**")).hasRole("ADMINISTRADOR")
 
                        // Usuarios
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/usuarios/**")).hasRole("ADMINISTRADOR")

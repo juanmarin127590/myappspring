@@ -50,11 +50,11 @@ public class Pedido {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_metodo_pago", nullable = false)
-    private MetodoPago metodoPago;
+    private MetodoPago idMetodoPago;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_estado", nullable = false)
-    private EstadoPedido estado;
+    private EstadoPedido idEstado;
 
     @Column(name = "fecha_pedido", nullable = false, updatable = false)
     @CreationTimestamp
