@@ -50,26 +50,35 @@ public class SecurityConfig {
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos/**")).permitAll()
 
+                        // 4. ENDPOINTS DE USUARIO AUTENTICADO (Gestión de Direcciones)
 
-                        // ADMINISTRADOR
-                        // 4. ENDPOINTS ADMINISTRATIVOS (Categorías) - CRUD
+                        // Cualquier usuario autenticado puede gestionar SUS propias direcciones (CRUD)
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones")).authenticated()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/**")).authenticated()
+
+                        // 5. ENDPOINTS ADMINISTRATIVOS (Acceso global)
+                        // La gestión administrativa de cualquier recurso debe ser para ROLE_ADMINISTRADOR
+
+                        //Categorías
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/categorias/**")).hasRole("ADMINISTRADOR")
                         
-                       // 5. ENDPOINTS ADMINISTRATIVOS (Productos) - CRUD + Listar todos
+                        // Productos
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/productos/admin")).hasRole("ADMINISTRADOR")
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/productos")).hasRole("ADMINISTRADOR")
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/productos/**")).hasRole("ADMINISTRADOR")
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/productos/**")).hasRole("ADMINISTRADOR")
 
-                       // 6. Acciones de Administrador (Usuarios) - CRUD
+                        // Direcciones (Administrador)
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/admin/**")).hasRole("ADMINISTRADOR")
+
+                       // Usuarios
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/usuarios/**")).hasRole("ADMINISTRADOR")
 
-                       // 7. Todas las demás peticiones requieren autenticación
+                       // 6. Todas las demás peticiones requieren autenticación
                         .anyRequest().authenticated())
                         
                 // Habilita la autenticación básica
-                .httpBasic(httpBasic -> {
-                })
+                .httpBasic(httpBasic -> {})
                 // Configuración para permitir el iframe de la consola H2
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
