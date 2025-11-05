@@ -51,6 +51,12 @@ public class SecurityConfig {
                         // 4. ENDPOINTS DE USUARIO AUTENTICADO
                         // Gestión de Direcciones (CRUD)
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/**")).authenticated()
+
+                        // Gestión de Pedidos (CRUD)
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/**")).authenticated()
+                
+                        // Gestión de Carrito de Compras (CRUD) - USUARIO AUTENTICADO
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/carrito/**")).authenticated()
                 
                         // Gestión de Pedidos (CRUD) - USUARIO AUTENTICADO
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos")).authenticated() // POST y GET de historial

@@ -10,6 +10,7 @@ import com.myapp.models.Usuario;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     // Podemos definir métodos personalizados que Spring Data JPA implementará
+    
     // automáticamente
     Usuario findByEmail(String email); // Buscar un usuario por su email
 
