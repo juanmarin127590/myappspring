@@ -3,8 +3,13 @@ package com.myapp.services;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.myapp.models.Rol;
 import com.myapp.models.Usuario;
 import com.myapp.repositories.RolRepository;
@@ -28,8 +33,8 @@ public class UsuarioServices {
     // 1. Crear un nuevo usuario
     public Usuario registrarNuevoCliente(Usuario usuario) {
         // 1. Verificación del email (Lógica de Negocio)
-        if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
-            throw new RuntimeException("El email ya está registrado: " + usuario.getEmail());
+        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+            throw new IllegalArgumentException("El email ya se encuentra registrado: " + usuario.getEmail());
         }
         
         //2. Encriptar la contraseña antes de guardar
@@ -41,11 +46,37 @@ public class UsuarioServices {
                 .orElseThrow(() -> new RuntimeException("Rol 'CLIENTE' no encontrado. Ejecute el DataSeeder."));
 
         // Usar Collections.singleton para crear un Set inmutable con un solo elemento
-        usuario.setRoles(Collections.singleton(clienteRol));        
+        usuario.setRoles(Collections.singleton(clienteRol));    
+        
+        // 4. Establecer valores por defecto (si no vienen en el request)
+        if (usuario.getActivo() == null) {
+            usuario.setActivo(true);
+        }
 
-        // 4. Persistencia
+        // 5. Persistencia
         return usuarioRepository.save(usuario);
     }
+
+   // Método para crear usuario con roles específicos (Para uso administrativo)
+    @Transactional
+    public Usuario crearUsuarioAdmin(Usuario usuario, Set<String> nombresRoles) {
+        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+            throw new IllegalArgumentException("El email ya se encuentra registrado: " + usuario.getEmail());
+        }
+
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        
+        Set<Rol> roles = nombresRoles.stream()
+                .map(nombre -> rolRepository.findByNombreRol(nombre)
+                    .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombre)))
+                .collect(Collectors.toSet());
+        
+        usuario.setRoles(roles);
+        usuario.setActivo(true);
+        
+        return usuarioRepository.save(usuario);
+    }
+
 
     // 2. Leer todos los usuarios
     public List<Usuario> obtenerTodosLosUsuarios() {

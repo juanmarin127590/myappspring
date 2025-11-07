@@ -1,19 +1,45 @@
-package com.myapp.config;
+package com.myapp.util.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.myapp.util.security.CustomUserDetailsService;
+import com.myapp.util.security.jwt.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity // Habilita la seguridad web de Spring Security
 public class SecurityConfig {
+
+    private final CustomUserDetailsService customUserDetailsService;
+
+    // Inyectar UserDetailsService para el AuthenticationManager
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+    // Nuevo Bean para el filtro JWT
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
+    }
+    
+    // Exponer el AuthenticationManager
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     // Define un codificador de contraseñas (Patrón de Diseño: Factory Method)
     @Bean
@@ -36,12 +62,14 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable()) // Deshabilita CSRF para APIs REST sin estado (Stateless)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 💥 JWT es stateless
                 .authorizeHttpRequests(authorize -> authorize
                         // 1. Permite el acceso sin autenticación a la consola H2
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
 
                         // 2. REGISTRO PÚBLICO (POST): Permite a cualquier persona crear un usuario
                         // (Registro)
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll() // para Login y otros de autenticación
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/usuario")).permitAll()
 
                        // 3. ENDPOINTS PÚBLICOS DE CATÁLOGO (Categorías y Productos)
@@ -49,6 +77,7 @@ public class SecurityConfig {
                         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos/**")).permitAll()
 
                         // 4. ENDPOINTS DE USUARIO AUTENTICADO
+                        // (Todos los demás endpoints de Direcciones, Pedidos, Carrito, etc., deben ser .authenticated() o .hasRole())
                         // Gestión de Direcciones (CRUD)
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/**")).authenticated()
 
@@ -90,6 +119,9 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> {})
                 // Configuración para permitir el iframe de la consola H2
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+
+        // Agregar el filtro JWT antes del filtro de Basic/Form Login
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);        
 
         return http.build();
     }
