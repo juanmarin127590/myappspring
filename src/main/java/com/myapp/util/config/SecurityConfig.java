@@ -86,6 +86,9 @@ public class SecurityConfig {
                 
                         // Gestión de Carrito de Compras (CRUD) - USUARIO AUTENTICADO
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/carrito/**")).authenticated()
+
+                        // Gestión de Pagos (Procesamiento) - NUEVO
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pagos/process")).authenticated()
                 
                         // Gestión de Pedidos (CRUD) - USUARIO AUTENTICADO
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos")).authenticated() // POST y GET de historial
