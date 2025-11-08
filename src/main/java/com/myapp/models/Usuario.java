@@ -86,5 +86,4 @@ public class Usuario {
     public void setActivo(Boolean activo) {this.activo = activo;}
     public Set<Rol> getRoles() { return roles; }
     public void setRoles(Set<Rol> roles) { this.roles = roles; }
-
 }

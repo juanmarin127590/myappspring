@@ -60,7 +60,7 @@ public class UsuarioServices {
    // Método para crear usuario con roles específicos (Para uso administrativo)
     @Transactional
     public Usuario crearUsuarioAdmin(Usuario usuario, Set<String> nombresRoles) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+        if (usuarioRepository.existsByEmail(usuario.getEmail())){
             throw new IllegalArgumentException("El email ya se encuentra registrado: " + usuario.getEmail());
         }
 

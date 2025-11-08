@@ -1,22 +1,18 @@
 package com.myapp.models;
 
-import java.util.List;
-
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.annotation.Id;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-@EntityScan
+@Entity
 @Table(name = "Direcciones")
 @Data
 public class Direccion {
@@ -61,7 +57,5 @@ public class Direccion {
 
     @Column(name = "es_predeterminada_facturacion" , nullable = false)
     private Boolean principalFactura = false; // Indica si es la dirección predeterminada de envio
-
-    private List<Direccion> direcciones;
 
 }

@@ -3,6 +3,7 @@ package com.myapp.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.persistence.Id;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
@@ -22,7 +23,7 @@ public class ItemCarrito {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_carrito", nullable = false)
     @JsonIgnore // Romper el bucle de serialización Carrito <-> ItemsCarrito
-    private CarritoCompra idCarrito;
+    private CarritoCompra carrito;
 
     @ManyToOne(fetch = FetchType.EAGER) // EAGER para facilitar la serialización del producto
     @JoinColumn(name = "id_producto", nullable = false)

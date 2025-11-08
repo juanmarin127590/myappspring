@@ -15,7 +15,7 @@ public interface DireccionRepository  extends JpaRepository<Direccion, Long>{
     List<Direccion> findByUsuario_IdUsuario(Long idUsuario);
 
     // Buscar la dirección principal de un usuario
-    Optional<Direccion> findByUsuario_IdUsuarioAndPrincipalTrue(Long idUsuario);
+    Optional<Direccion> findByUsuario_IdUsuarioAndPrincipalEnvioTrue(Long idUsuario);
     
     // Buscar una dirección específica por ID y por usuario (para asegurar propiedad)
     Optional<Direccion> findByIdDireccionAndUsuario_IdUsuario(Long idDireccion, Long idUsuario);

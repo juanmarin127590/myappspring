@@ -97,7 +97,7 @@ public class CarritoService {
             item.setCantidad(item.getCantidad() + cantidad);
         } else {
             item = new ItemCarrito();
-            item.setIdCarrito(carrito);
+            item.setCarrito(carrito);
             item.setProducto(producto);
             item.setCantidad(cantidad);
         }

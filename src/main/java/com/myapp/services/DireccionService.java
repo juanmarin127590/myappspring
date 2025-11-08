@@ -24,7 +24,7 @@ public class DireccionService {
     private void asegurarUnaPrincipal(Long idUsuario, Direccion nuevaDireccion) {
         if (nuevaDireccion.getPrincipalEnvio() != null && nuevaDireccion.getPrincipalEnvio()) {
             // Desactiva cualquier otra dirección principal para este usuario
-            direccionRepository.findByUsuario_IdUsuarioAndPrincipalTrue(idUsuario)
+            direccionRepository.findByUsuario_IdUsuarioAndPrincipalEnvioTrue(idUsuario)
                 .ifPresent(principalExistente -> {
                     if (!principalExistente.getIdDireccion().equals(nuevaDireccion.getIdDireccion())) {
                         principalExistente.setPrincipalEnvio(false);

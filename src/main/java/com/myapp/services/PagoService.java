@@ -77,7 +77,7 @@ public class PagoService {
         // --- 5. Crear el Registro de Pago ---
         Pago nuevoPago = new Pago();
         nuevoPago.setPedido(pedido);
-        nuevoPago.setMetodoPago(metodoPago);
+        nuevoPago.setIdMetodoPago(metodoPago);
         nuevoPago.setMonto(request.getMonto().setScale(2, RoundingMode.HALF_UP));
         nuevoPago.setEstado(estadoPago);
         nuevoPago.setReferenciaTransaccion(referencia);

@@ -13,7 +13,7 @@ public class PaymentRequest {
     private Long idPedido;
     
     @Nonnull()
-    private Integer idMetodoPago;
+    private Long idMetodoPago;
     
     @Nonnull()
     private BigDecimal monto;
