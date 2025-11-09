@@ -44,7 +44,7 @@ public class PagoService {
             .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado o no pertenece al usuario."));
             
         // Validar que el pedido esté en estado "Pendiente Pago" (Asumimos ID 1)
-        if (!pedido.getIdEstado().getIdEstado().equals(0)) {
+        if (!pedido.getIdEstado().getIdEstado().equals(1L)) { // ID 1 para 'Pendiente Pago'
             throw new IllegalStateException("El pedido no está en estado de 'Pendiente Pago'. Estado actual: " + pedido.getIdEstado().getNombreEstado());
         }
         
@@ -58,19 +58,19 @@ public class PagoService {
             .orElseThrow(() -> new IllegalArgumentException("Método de pago no válido."));
             
         // --- 3. Simulación de la Transacción Externa ---
-        boolean pagoExitoso = simularTransaccion(); // 💥 Lógica de simulación
+        boolean pagoExitoso = simularTransaccion(); // Lógica de simulación
 
         // --- 4. Determinar Estado y Referencia ---
         String estadoPago;
         String referencia = "REF-" + System.currentTimeMillis();
-        Integer idNuevoEstadoPedido;
+        Long idNuevoEstadoPedido;
         
         if (pagoExitoso) {
             estadoPago = "Aprobado";
-            idNuevoEstadoPedido = 2; // ID 2 = Pagado
+            idNuevoEstadoPedido = 2L; // ID 2 = Pagado
         } else {
             estadoPago = "Rechazado";
-            idNuevoEstadoPedido = 1; // ID 1 = Pendiente Pago (mantiene el estado)
+            idNuevoEstadoPedido = 1L; // ID 1 = Pendiente Pago (mantiene el estado)
             referencia = "FALLO-" + System.currentTimeMillis();
         }
         

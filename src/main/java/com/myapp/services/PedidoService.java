@@ -55,7 +55,7 @@ public class PedidoService {
             pedidoRequest.getDireccionEnvio().getIdDireccion(), idUsuario)
             .orElseThrow(() -> new IllegalArgumentException("Dirección de envío no válida o no pertenece al usuario."));
         
-        MetodoPago metodoPago = metodoPagoRepository.findById(pedidoRequest.getIdMetodoPago())
+        MetodoPago metodoPago = metodoPagoRepository.findByIdMetodoPago(pedidoRequest.getIdMetodoPago())
             .orElseThrow(() -> new IllegalArgumentException("Método de pago no válido."));
 
         // Estado inicial del pedido (ej. ID 0 = "Pendiente")
@@ -141,11 +141,15 @@ public class PedidoService {
     
     // Método de Negocio: Cambiar Estado (Solo para Admin)
     @Transactional
-    public Pedido actualizarEstado(Long idPedido, Integer idNuevoEstado) {
+    public Pedido actualizarEstado(
+        Long idPedido, 
+        Integer idNuevoEstado
+        
+        ) {
         Pedido pedido = pedidoRepository.findById(idPedido)
             .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + idPedido));
 
-        EstadoPedido nuevoEstado = estadoPedidoRepository.findById(idNuevoEstado)
+        EstadoPedido nuevoEstado = estadoPedidoRepository.findByIdNuevoEstado(idNuevoEstado)
             .orElseThrow(() -> new IllegalArgumentException("Estado de pedido no válido."));
             
         pedido.setIdEstado(nuevoEstado);
@@ -173,7 +177,7 @@ public class PedidoService {
             }
             
             // Asignar el estado de Cancelado (asumo ID 3 para 'Anulado')
-            EstadoPedido estadoCancelado = estadoPedidoRepository.findById(3)
+            EstadoPedido estadoCancelado = estadoPedidoRepository.findByIdNuevoEstado(3)
                 .orElseThrow(() -> new IllegalStateException("Estado 'Cancelado' no encontrado."));
                 
             pedido.setIdEstado(estadoCancelado);

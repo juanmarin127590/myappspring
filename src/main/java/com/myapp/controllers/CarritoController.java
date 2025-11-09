@@ -72,7 +72,7 @@ public class CarritoController {
             carritoService.eliminarItem(idUsuario, idItemCarrito);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
     

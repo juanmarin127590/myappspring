@@ -62,64 +62,61 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable()) // Deshabilita CSRF para APIs REST sin estado (Stateless)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 💥 JWT es stateless
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT es stateless
                 .authorizeHttpRequests(authorize -> authorize
-                        // 1. Permite el acceso sin autenticación a la consola H2
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+                        // ... (Reglas #1 y #2 para /h2-console/ y /api/auth/ siguen igual)
 
-                        // 2. REGISTRO PÚBLICO (POST): Permite a cualquier persona crear un usuario
-                        // (Registro)
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll() // para Login y otros de autenticación
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/usuario")).permitAll()
+                    // 1. Permite el acceso sin autenticación a la consola H2
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
 
-                       // 3. ENDPOINTS PÚBLICOS DE CATÁLOGO (Categorías y Productos)
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/categorias/**")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos/**")).permitAll()
+                    // 2. REGISTRO PÚBLICO (POST) y LOGIN
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll() 
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/usuarios")).permitAll()
 
-                        // 4. ENDPOINTS DE USUARIO AUTENTICADO
-                        // (Todos los demás endpoints de Direcciones, Pedidos, Carrito, etc., deben ser .authenticated() o .hasRole())
-                        // Gestión de Direcciones (CRUD)
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/**")).authenticated()
+                    // ==========================================================
+                    // SECCIÓN CORREGIDA: PRIORIZAR REGLAS RESTRICTIVAS Y ESPECIFICAR MÉTODOS
+                    // ==========================================================
+                    
+                    // 3. ENDPOINTS ADMINISTRATIVOS (ROLE_ADMINISTRADOR) - PRIORIDAD 
+                    
+                    // Categorías (POST, PUT, DELETE) 
+                    // Se usa un comodín general y luego se permite GET a todos
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/categorias/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/categorias/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/categorias/**")).hasRole("ADMINISTRADOR")
+                    
+                    // Productos (CRUD) - Usar matchers exactos para CRUD, y dejar GET para la sección pública.
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/productos")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/productos/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/productos/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/productos/admin/**")).hasRole("ADMINISTRADOR") // Si tienes endpoints específicos de admin
 
-                        // Gestión de Pedidos (CRUD)
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/**")).authenticated()
-                
-                        // Gestión de Carrito de Compras (CRUD) - USUARIO AUTENTICADO
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/carrito/**")).authenticated()
-
-                        // Gestión de Pagos (Procesamiento) - NUEVO
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pagos/process")).authenticated()
-                
-                        // Gestión de Pedidos (CRUD) - USUARIO AUTENTICADO
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos")).authenticated() // POST y GET de historial
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/**")).authenticated() // GET detalle, PUT cancelar
-
-                        // 5. ENDPOINTS ADMINISTRATIVOS (ROLE_ADMINISTRADOR)
-                        // La gestión administrativa de cualquier recurso debe ser para ROLE_ADMINISTRADOR
-
-                        //Categorías
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/categorias/**")).hasRole("ADMINISTRADOR")
-                        
-                        // Productos
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/productos/admin")).hasRole("ADMINISTRADOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/productos")).hasRole("ADMINISTRADOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/productos/**")).hasRole("ADMINISTRADOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/productos/**")).hasRole("ADMINISTRADOR")
-
-                        // Direcciones (Administrador)
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/admin/**")).hasRole("ADMINISTRADOR")
-
-                        // Pedidos (Administrador) - Listar todos y actualizar estado
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/admin/**")).hasRole("ADMINISTRADOR")
-
-                       // Usuarios
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/usuarios/**")).hasRole("ADMINISTRADOR")
-
-                       // 6. Todas las demás peticiones requieren autenticación
-                        .anyRequest().authenticated())
+                    // Direcciones, Pedidos, Usuarios (Administrador) - Cualquier método
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/admin/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/admin/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/usuarios/**")).hasRole("ADMINISTRADOR")
+                    
+                    // 4. ENDPOINTS PÚBLICOS DE CATÁLOGO (Solo Lectura) - PRIORIDAD 
+                    
+                    // Categorías (GET) - Permite sólo lectura a TODOS
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/categorias/**")).permitAll() 
+                    
+                    // Productos (GET) - Permite sólo lectura a TODOS
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/productos/**")).permitAll()
+                    
+                    // 5. ENDPOINTS DE USUARIO AUTENTICADO - PRIORIDAD  (El resto de la lógica de negocio)
+                    
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/**")).authenticated()
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/**")).authenticated()
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/carrito/**")).authenticated()
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pagos/process")).authenticated()
+                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos")).authenticated()
+                    
+                    // 6. Todas las demás peticiones requieren autenticación
+                    .anyRequest().authenticated())
                         
                 // Habilita la autenticación básica
-                .httpBasic(httpBasic -> {})
+                //.httpBasic(httpBasic -> {})
                 // Configuración para permitir el iframe de la consola H2
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 

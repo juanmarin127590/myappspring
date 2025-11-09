@@ -21,6 +21,7 @@ public class EstadoPedido {
     @Column(name = "nombre_estado", nullable = false, length = 50, unique = true)
     private String nombreEstado;
 
-    
+    @Column(name = "descripcion", columnDefinition = "TEXT")
+    private String descripcion;
 
 }
