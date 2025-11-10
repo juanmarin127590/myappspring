@@ -31,6 +31,8 @@ public class UsuarioServices {
     }
 
     // 1. Crear un nuevo usuario
+
+    @Transactional
     public Usuario registrarNuevoCliente(Usuario usuario) {
         // 1. Verificación del email (Lógica de Negocio)
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {

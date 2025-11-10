@@ -1,10 +1,13 @@
 package com.myapp.util.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,22 +20,26 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.myapp.util.security.CustomUserDetailsService;
 import com.myapp.util.security.jwt.JwtAuthenticationFilter;
+import com.myapp.util.security.jwt.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity // Habilita la seguridad web de Spring Security
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // Inyectar UserDetailsService para el AuthenticationManager
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
-        this.customUserDetailsService = customUserDetailsService;
+    @Autowired
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    // Nuevo Bean para el filtro JWT
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
+    public AuthenticationProvider authenticationProvider(CustomUserDetailsService customUserDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
     }
     
     // Exponer el AuthenticationManager
@@ -58,7 +65,7 @@ public class SecurityConfig {
 
     // Define la cadena de filtros de seguridad
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomUserDetailsService customUserDetailsService) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable()) // Deshabilita CSRF para APIs REST sin estado (Stateless)
@@ -94,7 +101,9 @@ public class SecurityConfig {
                     // Direcciones, Pedidos, Usuarios (Administrador) - Cualquier método
                     .requestMatchers(AntPathRequestMatcher.antMatcher("/api/direcciones/admin/**")).hasRole("ADMINISTRADOR")
                     .requestMatchers(AntPathRequestMatcher.antMatcher("/api/pedidos/admin/**")).hasRole("ADMINISTRADOR")
-                    .requestMatchers(AntPathRequestMatcher.antMatcher("/api/usuarios/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/usuarios/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/usuarios/**")).hasRole("ADMINISTRADOR")
+                    .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/usuarios/**")).hasRole("ADMINISTRADOR")
                     
                     // 4. ENDPOINTS PÚBLICOS DE CATÁLOGO (Solo Lectura) - PRIORIDAD 
                     
@@ -121,7 +130,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         // Agregar el filtro JWT antes del filtro de Basic/Form Login
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);        
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
