@@ -4,6 +4,8 @@ import java.util.Map;
 
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.myapp.models.CarritoCompra;
+import com.myapp.util.security.CustomUserDetails;
 import com.myapp.services.CarritoService;
 
 @RestController
@@ -28,8 +31,10 @@ public class CarritoController {
     
     // Placeholder para obtener el ID de usuario (debes usar tu lógica de Spring Security)
     private Long getAuthenticatedUserId() {
-        // *** PLACEHOLDER: Usar ID real del usuario autenticado ***
-        return 2L; 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Asegúrate de que el principal es una instancia de tu CustomUserDetails
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return userDetails.getIdUsuario();
     }
 
     // ----------------------------------------------------

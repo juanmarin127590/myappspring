@@ -2,6 +2,8 @@ package com.myapp.controllers;
 
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.myapp.models.Direccion;
+import com.myapp.util.security.CustomUserDetails;
 import com.myapp.services.DireccionService;
 
 @Controller
@@ -30,11 +33,10 @@ public class DireccionController {
 
     private Long getAuthenticatedUserId() {
         // *** ESTE ES UN PLACEHOLDER. IMPLEMENTAR LA OBTENCIÓN DEL ID REAL DEL USUARIO AUTENTICADO. ***
-        // En una implementación real de Spring Security, esto se haría obteniendo el principal del SecurityContextHolder.
-        // Ejemplo: return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
-        // Para pruebas iniciales, puedes usar un ID fijo si el usuario 'cliente' tiene ID 1 o 2.
-        // Si usas Basic Auth y el ID del cliente es 2:
-        return 2L; 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Asegúrate de que el principal es una instancia de tu CustomUserDetails
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return userDetails.getIdUsuario();
     }
 
     // ----------------------------------------------------

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.myapp.models.Pedido;
+import com.myapp.util.security.CustomUserDetails;
 import com.myapp.services.PedidoService;
 
 @RestController
@@ -28,8 +31,10 @@ public class PedidoController {
 
     // Placeholder para obtener el ID de usuario (debes usar tu lógica de Spring Security)
     private Long getAuthenticatedUserId() {
-        // *** PLACEHOLDER: Usar ID real del usuario autenticado ***
-        return 2L; 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Asegúrate de que el principal es una instancia de tu CustomUserDetails
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return userDetails.getIdUsuario();
     }
 
     // ----------------------------------------------------
