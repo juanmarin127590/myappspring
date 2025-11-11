@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "Pagos")
+@Table(name = "pagos")
 @Data
 public class Pago {
 
@@ -35,7 +35,7 @@ public class Pago {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_metodo_pago", nullable = false)
-    private MetodoPago IdMetodoPago;
+    private MetodoPago metodoPago;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monto;

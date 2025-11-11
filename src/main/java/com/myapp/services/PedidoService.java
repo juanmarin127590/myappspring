@@ -55,20 +55,22 @@ public class PedidoService {
             pedidoRequest.getDireccionEnvio().getIdDireccion(), idUsuario)
             .orElseThrow(() -> new IllegalArgumentException("Dirección de envío no válida o no pertenece al usuario."));
         
-        MetodoPago metodoPago = metodoPagoRepository.findByIdMetodoPago(pedidoRequest.getIdMetodoPago())
+        MetodoPago metodoPago = metodoPagoRepository.findById(pedidoRequest.getIdMetodoPago().getIdMetodoPago())
             .orElseThrow(() -> new IllegalArgumentException("Método de pago no válido."));
 
         // Estado inicial del pedido (ej. ID 0 = "Pendiente")
-        EstadoPedido estadoInicial = estadoPedidoRepository.findById((long) 0) 
-            .orElseThrow(() -> new IllegalStateException("Estado inicial del pedido (ID 1) no encontrado."));
+        EstadoPedido estadoInicial = estadoPedidoRepository.findById(0) 
+            .orElseThrow(() -> new IllegalStateException("Estado inicial del pedido (ID 0) no encontrado."));
 
         // --- 2. Inicializar Pedido ---
         Pedido nuevoPedido = new Pedido();
         nuevoPedido.setUsuario(usuario);
         nuevoPedido.setDireccionEnvio(direccionEnvio);
+        nuevoPedido.setDireccionFacturacion(direccionEnvio); // Asignar la misma dirección para facturación
         nuevoPedido.setIdMetodoPago(metodoPago);
         nuevoPedido.setIdEstado(estadoInicial);
         nuevoPedido.setEstadoPago("Pendiente");
+        nuevoPedido.setImpuestos(new BigDecimal("0.00")); // Asignar valor para impuestos
         nuevoPedido.setMontoEnvio(new BigDecimal("6000.00")); // Ejemplo de costo de envío fijo
 
         BigDecimal subtotalGeneral = BigDecimal.ZERO;
@@ -112,6 +114,7 @@ public class PedidoService {
         }
 
         // --- 4. Calcular Monto Total del Pedido ---
+        nuevoPedido.setSubtotal(subtotalGeneral.setScale(2, RoundingMode.HALF_UP));
         BigDecimal montoTotal = subtotalGeneral.add(nuevoPedido.getMontoEnvio());
         nuevoPedido.setMontoTotal(montoTotal.setScale(2, RoundingMode.HALF_UP));
 
@@ -149,7 +152,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
             .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + idPedido));
 
-        EstadoPedido nuevoEstado = estadoPedidoRepository.findByIdNuevoEstado(idNuevoEstado)
+        EstadoPedido nuevoEstado = estadoPedidoRepository.findById(idNuevoEstado.intValue())
             .orElseThrow(() -> new IllegalArgumentException("Estado de pedido no válido."));
             
         pedido.setIdEstado(nuevoEstado);
@@ -177,7 +180,7 @@ public class PedidoService {
             }
             
             // Asignar el estado de Cancelado (asumo ID 3 para 'Anulado')
-            EstadoPedido estadoCancelado = estadoPedidoRepository.findByIdNuevoEstado(3)
+            EstadoPedido estadoCancelado = estadoPedidoRepository.findById(3)
                 .orElseThrow(() -> new IllegalStateException("Estado 'Cancelado' no encontrado."));
                 
             pedido.setIdEstado(estadoCancelado);
