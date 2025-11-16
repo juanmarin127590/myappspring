@@ -107,11 +107,12 @@ public class CarritoService {
             throw new IllegalStateException("Stock insuficiente. Solo hay " + producto.getCantidadStock() + " unidades disponibles.");
         }
 
-        itemCarritoRepository.save(item);
+        ItemCarrito itemGuardado = itemCarritoRepository.save(item);
 
-        // Calcular totales y devolver el objeto en memoria, es más eficiente.
-        // La transacción se encargará de guardar los cambios.
-        return calcularTotales(carrito);
+        // Forzar la recarga del carrito desde la base de datos dentro de la misma transacción
+        // para asegurar que la lista de items esté actualizada antes de calcular los totales.
+        CarritoCompra carritoActualizado = carritoRepository.findById(carrito.getIdCarrito()).get();
+        return calcularTotales(carritoActualizado);
     }
 
     /**
