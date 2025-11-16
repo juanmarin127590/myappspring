@@ -24,7 +24,7 @@ public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_categoria")
-    private Long idCategoria;
+    private Integer idCategoria;
 
     @Column(name = "nombre_categoria", nullable = false, unique = true, length = 100)
     private String nombreCategoria;
@@ -47,10 +47,10 @@ public class Categoria {
     }
 
     // Getters y Setters
-    public Long getIdCategoria() {
+    public Integer getIdCategoria() {
         return idCategoria; 
     }
-    public void setIdCategoria(Long idCategoria) {
+    public void setIdCategoria(Integer idCategoria) {
         this.idCategoria = idCategoria; 
     }
     public String getNombreCategoria() {

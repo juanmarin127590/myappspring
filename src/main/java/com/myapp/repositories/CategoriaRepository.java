@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.myapp.models.Categoria;
 
 @Repository
-public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
+public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
     // Método personalizado para buscar por el nombre único de la categoría.
     Optional<Categoria> findByNombreCategoria(String nombre);
 }

@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 // Anotación para indicar que esta clase es una entidad persistente
 @Entity
 // Anotación para mapear a la tabla 'Usuario' en la BD
-@Table(name = "Usuario")
+@Table(name = "usuario")
 public class Usuario {
 
     @Id
