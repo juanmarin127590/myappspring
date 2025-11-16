@@ -55,7 +55,7 @@ public class PedidoService {
             pedidoRequest.getDireccionEnvio().getIdDireccion(), idUsuario)
             .orElseThrow(() -> new IllegalArgumentException("Dirección de envío no válida o no pertenece al usuario."));
         
-        MetodoPago metodoPago = metodoPagoRepository.findById(pedidoRequest.getIdMetodoPago().getIdMetodoPago())
+        MetodoPago metodoPago = metodoPagoRepository.findById(pedidoRequest.getMetodoPago().getIdMetodoPago())
             .orElseThrow(() -> new IllegalArgumentException("Método de pago no válido."));
 
         // Estado inicial del pedido (ej. ID 0 = "Pendiente")
@@ -67,8 +67,8 @@ public class PedidoService {
         nuevoPedido.setUsuario(usuario);
         nuevoPedido.setDireccionEnvio(direccionEnvio);
         nuevoPedido.setDireccionFacturacion(direccionEnvio); // Asignar la misma dirección para facturación
-        nuevoPedido.setIdMetodoPago(metodoPago);
-        nuevoPedido.setIdEstado(estadoInicial);
+        nuevoPedido.setMetodoPago(metodoPago);
+        nuevoPedido.setEstadoPedido(estadoInicial);
         nuevoPedido.setEstadoPago("Pendiente");
         nuevoPedido.setImpuestos(new BigDecimal("0.00")); // Asignar valor para impuestos
         nuevoPedido.setMontoEnvio(new BigDecimal("6000.00")); // Ejemplo de costo de envío fijo
@@ -155,7 +155,7 @@ public class PedidoService {
         EstadoPedido nuevoEstado = estadoPedidoRepository.findById(idNuevoEstado.intValue())
             .orElseThrow(() -> new IllegalArgumentException("Estado de pedido no válido."));
             
-        pedido.setIdEstado(nuevoEstado);
+        pedido.setEstadoPedido(nuevoEstado);
         
         // Se podría agregar lógica adicional aquí (ej. enviar email al cliente, manejar devoluciones, etc.)
 
@@ -168,7 +168,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findByIdPedidoAndUsuario_IdUsuario(idPedido, idUsuario)
             .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado o no pertenece al usuario."));
 
-        String estadoActual = pedido.getIdEstado().getNombreEstado();
+        String estadoActual = pedido.getEstadoPedido().getNombreEstado();
         
         // Regla de Negocio: Solo se puede cancelar si está 'Pendiente Pago' o 'Pagado'
         if ("Pendiente".equals(estadoActual) || "Aprobado".equals(estadoActual)) {
@@ -183,7 +183,7 @@ public class PedidoService {
             EstadoPedido estadoCancelado = estadoPedidoRepository.findById(3)
                 .orElseThrow(() -> new IllegalStateException("Estado 'Cancelado' no encontrado."));
                 
-            pedido.setIdEstado(estadoCancelado);
+            pedido.setEstadoPedido(estadoCancelado);
             return pedidoRepository.save(pedido);
         } else {
             throw new IllegalStateException("El pedido con estado " + estadoActual + " no puede ser cancelado.");

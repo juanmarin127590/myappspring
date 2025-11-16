@@ -16,7 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Categorias")
+@Table(name = "categorias")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "productos"})
 public class Categoria {
 

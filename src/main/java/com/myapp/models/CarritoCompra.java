@@ -26,7 +26,7 @@ import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Entity
-@Table(name = "CarritoCompra")
+@Table(name = "carrito_compra")
 @Data
 public class CarritoCompra {
 

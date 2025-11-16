@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 // Anotación para indicar que esta clase es una entidad persistente
 @Entity
 // Anotación para mapear a la tabla 'Usuario' en la BD
-@Table(name = "usuario")
+@Table(name = "Usuario")
 public class Usuario {
 
     @Id
@@ -62,7 +62,7 @@ public class Usuario {
     // Relación Many-to-Many con Roles
     @ManyToMany(fetch = FetchType.EAGER) // Carga EAGER para obtener roles al cargar el usuario (útil para seguridad)
     @JoinTable(
-        name = "UsuarioRoles", // Nombre de la tabla intermedia en la BD
+        name = "usuario_roles", // Nombre de la tabla intermedia en la BD
         joinColumns = @JoinColumn(name = "id_usuario"), // Columna de esta entidad (Usuario)
         inverseJoinColumns = @JoinColumn(name = "id_rol") // Columna de la entidad relacionada (Rol)
     )

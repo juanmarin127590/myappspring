@@ -23,7 +23,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "Pedidos")
+@Table(name = "pedidos")
 @Data
 public class Pedido {
     
@@ -50,11 +50,11 @@ public class Pedido {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_metodo_pago", nullable = false)
-    private MetodoPago idMetodoPago;
+    private MetodoPago metodoPago;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_estado", nullable = false)
-    private EstadoPedido idEstado;
+    @JoinColumn(name = "id_estado_pedido", referencedColumnName = "id_estado_pedido", nullable = false)
+    private EstadoPedido estadoPedido;
 
     @Column(name = "fecha_pedido", nullable = false, updatable = false)
     @CreationTimestamp

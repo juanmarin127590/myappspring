@@ -44,8 +44,8 @@ public class PagoService {
             .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado o no pertenece al usuario."));
             
         // Validar que el pedido esté en estado "Pendiente Pago" (Asumimos ID 1)
-        if (!pedido.getIdEstado().getIdEstado().equals(1L)) { // ID 1 para 'Pendiente Pago'
-            throw new IllegalStateException("El pedido no está en estado de 'Pendiente Pago'. Estado actual: " + pedido.getIdEstado().getNombreEstado());
+        if (!pedido.getEstadoPedido().getIdEstadoPedido().equals(1)) { // ID 1 para 'Pendiente Pago'
+            throw new IllegalStateException("El pedido no está en estado de 'Pendiente Pago'. Estado actual: " + pedido.getEstadoPedido().getNombreEstado());
         }
         
         // Validar que el monto del pago coincida con el monto total del pedido
@@ -63,21 +63,21 @@ public class PagoService {
         // --- 4. Determinar Estado y Referencia ---
         String estadoPago;
         String referencia = "REF-" + System.currentTimeMillis();
-        Long idNuevoEstadoPedido;
+        Integer idNuevoEstadoPedido;
         
         if (pagoExitoso) {
             estadoPago = "Aprobado";
-            idNuevoEstadoPedido = 2L; // ID 2 = Pagado
+            idNuevoEstadoPedido = 2; // ID 2 = Pagado
         } else {
             estadoPago = "Rechazado";
-            idNuevoEstadoPedido = 1L; // ID 1 = Pendiente Pago (mantiene el estado)
+            idNuevoEstadoPedido = 1; // ID 1 = Pendiente Pago (mantiene el estado)
             referencia = "FALLO-" + System.currentTimeMillis();
         }
         
         // --- 5. Crear el Registro de Pago ---
         Pago nuevoPago = new Pago();
         nuevoPago.setPedido(pedido);
-        nuevoPago.setIdMetodoPago(metodoPago);
+        nuevoPago.setMetodoPago(metodoPago);
         nuevoPago.setMonto(request.getMonto().setScale(2, RoundingMode.HALF_UP));
         nuevoPago.setEstado(estadoPago);
         nuevoPago.setReferenciaTransaccion(referencia);
@@ -88,7 +88,7 @@ public class PagoService {
         EstadoPedido nuevoEstado = estadoPedidoRepository.findById(idNuevoEstadoPedido)
             .orElseThrow(() -> new IllegalStateException("Estado de pedido ID " + idNuevoEstadoPedido + " no encontrado."));
             
-        pedido.setIdEstado(nuevoEstado);
+        pedido.setEstadoPedido(nuevoEstado);
         pedido.setEstadoPago(estadoPago); // Actualiza el campo de estado de pago en el pedido
         pedido.setReferenciaPago(referencia); // Guarda la referencia de la transacción
         

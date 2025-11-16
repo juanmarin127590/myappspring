@@ -9,14 +9,14 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "EstadosPedido")
+@Table(name = "estados_pedido")
 @Data
 public class EstadoPedido {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_estado_pedido")
-    private Integer idEstado;
+    private Integer idEstadoPedido;
 
     @Column(name = "nombre_estado", nullable = false, length = 50, unique = true)
     private String nombreEstado;
