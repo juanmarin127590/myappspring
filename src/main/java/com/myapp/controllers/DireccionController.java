@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,12 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.myapp.models.Direccion;
 import com.myapp.util.security.CustomUserDetails;
 import com.myapp.services.DireccionService;
 
-@Controller
+@RestController
 @RequestMapping("/api/direcciones")
 public class DireccionController {
 
@@ -62,42 +62,26 @@ public class DireccionController {
 
     // POST: /api/direcciones - Crear una nueva dirección para el usuario
     @PostMapping
-    public ResponseEntity<Object> crearDireccion(@RequestBody Direccion direccion) {
+    public ResponseEntity<Direccion> crearDireccion(@RequestBody Direccion direccion) {
         Long idUsuario = getAuthenticatedUserId(); 
-        try {
-            Direccion nuevaDireccion = direccionService.crearDireccion(idUsuario, direccion);
-            return new ResponseEntity<>(nuevaDireccion, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        Direccion nuevaDireccion = direccionService.crearDireccion(idUsuario, direccion);
+        return new ResponseEntity<>(nuevaDireccion, HttpStatus.CREATED);
     }
 
     // PUT: /api/direcciones/{idDireccion} - Actualizar una dirección del usuario
     @PutMapping("/{idDireccion}")
-    public ResponseEntity<Object> actualizarDireccion(@PathVariable Long idDireccion, @RequestBody Direccion direccionDetalles) {
+    public ResponseEntity<Direccion> actualizarDireccion(@PathVariable Long idDireccion, @RequestBody Direccion direccionDetalles) {
         Long idUsuario = getAuthenticatedUserId(); 
-        try {
-            Direccion direccionActualizada = direccionService.actualizarDireccion(idDireccion, idUsuario, direccionDetalles);
-            return ResponseEntity.ok(direccionActualizada);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (IllegalStateException e) {
-             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        Direccion direccionActualizada = direccionService.actualizarDireccion(idDireccion, idUsuario, direccionDetalles);
+        return ResponseEntity.ok(direccionActualizada);
     }
 
     // DELETE: /api/direcciones/{idDireccion} - Eliminar una dirección del usuario
     @DeleteMapping("/{idDireccion}")
     public ResponseEntity<Void> eliminarDireccion(@PathVariable Long idDireccion) {
         Long idUsuario = getAuthenticatedUserId(); 
-        try {
-            direccionService.eliminarDireccion(idDireccion, idUsuario);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        direccionService.eliminarDireccion(idDireccion, idUsuario);
+        return ResponseEntity.noContent().build();
     }
 
     // ----------------------------------------------------

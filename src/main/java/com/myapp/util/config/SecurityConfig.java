@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,6 +25,7 @@ import com.myapp.util.security.jwt.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity // Habilita la seguridad web de Spring Security
+@EnableMethodSecurity(prePostEnabled = true) // Habilita @PreAuthorize
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;

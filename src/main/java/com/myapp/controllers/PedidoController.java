@@ -43,14 +43,10 @@ public class PedidoController {
     
     // POST: /api/pedidos - CREAR un nuevo pedido
    @PostMapping
-    public ResponseEntity<Object> crearPedido(@RequestBody Pedido pedidoRequest) {
+    public ResponseEntity<Pedido> crearPedido(@RequestBody Pedido pedidoRequest) {
         Long idUsuario = getAuthenticatedUserId();
-        try {
-            Pedido nuevoPedido = pedidoService.crearPedido(idUsuario, pedidoRequest);
-            return new ResponseEntity<>(nuevoPedido, HttpStatus.CREATED);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        Pedido nuevoPedido = pedidoService.crearPedido(idUsuario, pedidoRequest);
+        return new ResponseEntity<>(nuevoPedido, HttpStatus.CREATED);
     }
 
     // GET: /api/pedidos - Obtener historial de pedidos del usuario
@@ -72,16 +68,10 @@ public class PedidoController {
 
     // PUT: /api/pedidos/{idPedido}/cancelar - Cancelar un pedido
     @PutMapping("/{idPedido}/cancelar")
-    public ResponseEntity<Object> cancelarPedido(@PathVariable Long idPedido) {
+    public ResponseEntity<Pedido> cancelarPedido(@PathVariable Long idPedido) {
         Long idUsuario = getAuthenticatedUserId();
-        try {
-            Pedido pedidoCancelado = pedidoService.cancelarPedido(idPedido, idUsuario);
-            return ResponseEntity.ok(pedidoCancelado);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        Pedido pedidoCancelado = pedidoService.cancelarPedido(idPedido, idUsuario);
+        return ResponseEntity.ok(pedidoCancelado);
     }
 
 
@@ -105,13 +95,9 @@ public class PedidoController {
     
     // PUT: /api/pedidos/admin/{idPedido}/estado - Actualizar el estado del pedido (ADMIN)
     @PutMapping("/admin/{idPedido}/estado")
-    public ResponseEntity<Object> actualizarEstadoPedidoAdmin(@PathVariable Long idPedido, @RequestParam Integer idEstado) {
-        try {
-            Pedido pedidoActualizado = pedidoService.actualizarEstado(idPedido, idEstado);
-            return ResponseEntity.ok(pedidoActualizado);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<Pedido> actualizarEstadoPedidoAdmin(@PathVariable Long idPedido, @RequestParam Integer idEstado) {
+        Pedido pedidoActualizado = pedidoService.actualizarEstado(idPedido, idEstado);
+        return ResponseEntity.ok(pedidoActualizado);
     }
     
 }

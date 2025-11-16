@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
@@ -25,15 +28,9 @@ public class UsuarioController {
 
     // POST: /api/usuarios
     @PostMapping
-    public ResponseEntity<Usuario> registrarUsuario(@RequestBody Usuario usuario) {
-        try {
-            Usuario nuevoUsuario = usuarioService.registrarNuevoCliente(usuario);
-            return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            // Manejo de error de negocio (ej. Email ya existe)
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity<Usuario> registrarUsuario(@Valid @RequestBody Usuario usuario) {
+        Usuario nuevoUsuario = usuarioService.registrarNuevoCliente(usuario);
+        return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
     }
 
     // GET: /api/usuarios
@@ -46,32 +43,25 @@ public class UsuarioController {
     // GET: /api/usuarios/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
-        return usuarioService.obtenerUsuarioPorId(id)
-                .map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK)) // Si existe, devuelve 200 OK
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND)); // Si no existe, devuelve 404 Not Found
+        Usuario usuario = usuarioService.obtenerUsuarioPorId(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+        return new ResponseEntity<>(usuario, HttpStatus.OK);
     }
 
     // PUT: /api/usuarios/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario detalleUsuario) {
-        try {
-            Usuario usuarioActualizado = usuarioService.actualizarUsuario(id, detalleUsuario);
-            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK); // Devuelve 200 OK
-        } catch (RuntimeException e) {
-            // Manejo básico de excepción (404 Not Found)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Devuelve 404 Not Found si no existe
-        }
+    @PreAuthorize("hasRole('ADMINISTRADOR')") // Unificado con SecurityConfig
+    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody Usuario detalleUsuario) {
+        Usuario usuarioActualizado = usuarioService.actualizarUsuario(id, detalleUsuario);
+        return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK); // Devuelve 200 OK
     }
 
     // DELETE: /api/usuarios/{id}
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')") // Unificado con SecurityConfig
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
-        try {
-            usuarioService.eliminarUsuario(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Devuelve 204 No Content
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Devuelve 404 Not Found si no existe
-        }
+        usuarioService.eliminarUsuario(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Devuelve 204 No Content
     }
 
 }

@@ -58,9 +58,9 @@ public class PedidoService {
         MetodoPago metodoPago = metodoPagoRepository.findById(pedidoRequest.getMetodoPago().getIdMetodoPago())
             .orElseThrow(() -> new IllegalArgumentException("Método de pago no válido."));
 
-        // Estado inicial del pedido (ej. ID 0 = "Pendiente")
-        EstadoPedido estadoInicial = estadoPedidoRepository.findById(0) 
-            .orElseThrow(() -> new IllegalStateException("Estado inicial del pedido (ID 0) no encontrado."));
+        // Búsqueda de estado por nombre para mayor robustez
+        EstadoPedido estadoInicial = estadoPedidoRepository.findByNombreEstado("Pendiente")
+            .orElseThrow(() -> new IllegalStateException("Estado inicial 'Pendiente' no configurado en la base de datos."));
 
         // --- 2. Inicializar Pedido ---
         Pedido nuevoPedido = new Pedido();

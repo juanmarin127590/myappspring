@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.myapp.models.Categoria;
 import com.myapp.services.CategoriaService;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 
-@Controller
+@RestController
 @RequestMapping("/api/categorias")
 public class CategoriaController {
 
@@ -55,35 +55,23 @@ public class CategoriaController {
 
     // POST: /api/categorias ADMIN - Crear
     @PostMapping
-    public ResponseEntity<Object> crearCategoria(@RequestBody Categoria categoria) {
-        try {
-            Categoria nuevaCategoria = categoriaService.crearCategoria(categoria);
-            return new ResponseEntity<>(nuevaCategoria, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<Categoria> crearCategoria(@RequestBody Categoria categoria) {
+        Categoria nuevaCategoria = categoriaService.crearCategoria(categoria);
+        return new ResponseEntity<>(nuevaCategoria, HttpStatus.CREATED);
     }
 
     // PUT: /api/categorias/{id} (ADMIN) - Actualizar
     @PutMapping("/{id}")
-    public ResponseEntity<Object> actualizqrCategoria(@PathVariable Long id, @RequestBody Categoria categoriaDetalle){
-        try {
-            Categoria categoriaActualizada = categoriaService.actualizarCategoria(id, categoriaDetalle);
-            return ResponseEntity.ok(categoriaActualizada);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<Categoria> actualizqrCategoria(@PathVariable Long id, @RequestBody Categoria categoriaDetalle){
+        Categoria categoriaActualizada = categoriaService.actualizarCategoria(id, categoriaDetalle);
+        return ResponseEntity.ok(categoriaActualizada);
     }
 
     // DELETE: /api/categorias/{id} (ADMIN) - Eliminar
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarCategoria(@PathVariable Long id) {
-        try {
-            categoriaService.eliminarCategoria(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        categoriaService.eliminarCategoria(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -109,8 +109,9 @@ public class CarritoService {
 
         itemCarritoRepository.save(item);
 
-        // Recargar el carrito para tener la lista de ítems actualizada
-        return obtenerCarritoPorUsuario(idUsuario).get();
+        // Calcular totales y devolver el objeto en memoria, es más eficiente.
+        // La transacción se encargará de guardar los cambios.
+        return calcularTotales(carrito);
     }
 
     /**
