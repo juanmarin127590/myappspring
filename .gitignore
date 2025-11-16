@@ -1,1 +1,42 @@
 target/
+
+.mvn/
+.idea/
+*.iml
+*.log
+logs/
+tmp/
+.DS_Store
+.vscode/
+!src/main/resources/.gitkeep
+!src/test/resources/.gitkeep
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+.history
+
+### Eclipse ###
+.metadata
+bin/
+tmp/
+.settings/
+
+### Node.js ###
+node_modules/
+npm-debug.log
+yarn-error.log
+
+### Maven ###
+target/
