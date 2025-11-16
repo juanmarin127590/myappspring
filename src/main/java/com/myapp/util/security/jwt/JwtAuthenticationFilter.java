@@ -28,16 +28,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
+
+        System.out.println("JWT FILTER: " + request.getServletPath());
+        String path = request.getServletPath();
         // Si la ruta es de autenticación, no aplicamos el filtro y continuamos.
-        if (request.getServletPath().contains("/api/auth")) {
+        if (path.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
             String jwt = getJwtFromRequest(request);
-
+            System.out.println("JWT recibido: " + jwt);
+            System.out.println("ServletPath: " + request.getServletPath());
+            
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 Long userId = tokenProvider.getUserIdFromJWT(jwt);
 
@@ -45,10 +49,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+                System.out.println("Token válido, usuario: " + userId);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
             // Log: No se pudo establecer la autenticación del usuario en el contexto
+            ex.printStackTrace();
         }
 
         filterChain.doFilter(request, response);

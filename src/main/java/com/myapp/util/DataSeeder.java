@@ -43,7 +43,7 @@ public class DataSeeder implements CommandLineRunner {
 
         //1. Crear roles predeterminados si no existen
         Rol adminRol = createRoleIfNotFound("ADMINISTRADOR");
-        //Rol clienteRol = createRoleIfNotFound("CLIENTE");
+        Rol clienteRol = createRoleIfNotFound("CLIENTE");
 
         //2. Crear un usuario administrador inicial si no existe
         createAdminUser(adminRol);

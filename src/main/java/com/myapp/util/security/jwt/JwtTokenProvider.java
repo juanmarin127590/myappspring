@@ -7,9 +7,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
 import com.myapp.util.security.CustomUserDetails;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -25,7 +23,7 @@ public class JwtTokenProvider {
 
     @Value("${jwt.expiration}")
     private long jwtExpirationInMs;
-    
+
     // Genera la clave secreta a partir de la cadena en application.properties
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
@@ -62,16 +60,24 @@ public class JwtTokenProvider {
     // Valida el token
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);
+            Jwts.parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build().parseClaimsJws(authToken);
+            
+            System.out.println("JWT VALIDATION: Token válido ✔");
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException ex) {
             // Log: Token JWT inválido
+             System.out.println("JWT ERROR: Firma inválida o token corrupto ❌ → " + ex.getMessage());
         } catch (ExpiredJwtException ex) {
             // Log: Token JWT expirado
+            System.out.println("JWT ERROR: Token expirado ⏳ → " + ex.getMessage());
         } catch (UnsupportedJwtException ex) {
             // Log: Token JWT no soportado
+             System.out.println("JWT ERROR: Token no soportado 🚫 → " + ex.getMessage());
         } catch (IllegalArgumentException ex) {
             // Log: Cadena de claims JWT vacía
+            System.out.println("JWT ERROR: Token vacío o cadena inválida ⚠️ → " + ex.getMessage());
         }
         return false;
     }

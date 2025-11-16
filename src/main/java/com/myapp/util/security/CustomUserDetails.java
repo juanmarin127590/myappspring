@@ -27,7 +27,7 @@ public class CustomUserDetails implements UserDetails {
         this.activo = usuario.getActivo();
         // Mapear los roles del usuario a GrantedAuthority de Spring Security
         this.authorities = usuario.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getNombreRol().toUpperCase()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getNombreRol().trim().toUpperCase()))
                 .collect(Collectors.toList());
     }
 

@@ -32,12 +32,12 @@ public class CategoriaService {
     }
 
     // READ BY ID (R) - Obtener una categoría por ID
-    public Optional<Categoria> obtenerCategoriaPorId(Long id) {
+    public Optional<Categoria> obtenerCategoriaPorId(Integer id) {
         return categoriaRepository.findById(id);
     }
 
     // UPDATE (U) - Actualizar una categoría existente
-    public Categoria actualizarCategoria(Long id, Categoria categoriaDetalles) {
+    public Categoria actualizarCategoria(Integer id, Categoria categoriaDetalles) {
         return categoriaRepository.findById(id)
             .map(categoria -> {
                 if (!categoria.getNombreCategoria().equals(categoriaDetalles.getNombreCategoria())) {
@@ -55,7 +55,7 @@ public class CategoriaService {
     }
 
     // DELETE (D) - Eliminar una categoría
-    public void eliminarCategoria(Long id) {
+    public void eliminarCategoria(Integer id) {
         if (!categoriaRepository.existsById(id)) {
             throw new IllegalArgumentException("Categoría no encontrada con ID: " + id);
         }

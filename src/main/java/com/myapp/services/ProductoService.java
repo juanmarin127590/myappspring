@@ -57,26 +57,38 @@ public class ProductoService {
     public Producto actualizarProducto(Long id, Producto productoDetalles) {
         return productoRepository.findById(id)
             .map(productoExistente -> {
-                // 1. Validación de SKU único si el SKU ha cambiado
-                if (!productoExistente.getSku().equals(productoDetalles.getSku())) {
+                // 1. Actualizar y validar SKU si se proporciona y es diferente
+                if (productoDetalles.getSku() != null && !productoExistente.getSku().equals(productoDetalles.getSku())) {
                     Optional<Producto> existingSku = productoRepository.findBySku(productoDetalles.getSku());
                     if (existingSku.isPresent() && !existingSku.get().getIdProducto().equals(id)) {
                         throw new IllegalArgumentException("Ya existe otro producto con el SKU: " + productoDetalles.getSku());
                     }
+                    productoExistente.setSku(productoDetalles.getSku());
                 }
                 
-                // 2. Validación de Categoría
-                Categoria categoria = categoriaRepository.findById(productoDetalles.getCategoria().getIdCategoria())
-                    .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada con ID: " + productoDetalles.getCategoria().getIdCategoria()));
+                // 2. Actualizar y validar Categoría si se proporciona
+                if (productoDetalles.getCategoria() != null && productoDetalles.getCategoria().getIdCategoria() != null) {
+                    Categoria categoria = categoriaRepository.findById(productoDetalles.getCategoria().getIdCategoria())
+                        .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada con ID: " + productoDetalles.getCategoria().getIdCategoria()));
+                    productoExistente.setCategoria(categoria);
+                }
 
-                // 3. Aplicar cambios
-                productoExistente.setSku(productoDetalles.getSku());
-                productoExistente.setNombreProducto(productoDetalles.getNombreProducto());
-                productoExistente.setDescripcionLarga(productoDetalles.getDescripcionLarga());
-                productoExistente.setPrecio(productoDetalles.getPrecio());
-                productoExistente.setCantidadStock(productoDetalles.getCantidadStock());
-                productoExistente.setActivo(productoDetalles.getActivo());
-                productoExistente.setCategoria(categoria);
+                // 3. Actualizar otros campos solo si se proporcionan (no son null)
+                if (productoDetalles.getNombreProducto() != null) {
+                    productoExistente.setNombreProducto(productoDetalles.getNombreProducto());
+                }
+                if (productoDetalles.getDescripcionLarga() != null) {
+                    productoExistente.setDescripcionLarga(productoDetalles.getDescripcionLarga());
+                }
+                if (productoDetalles.getPrecio() != null) {
+                    productoExistente.setPrecio(productoDetalles.getPrecio());
+                }
+                if (productoDetalles.getCantidadStock() != null) {
+                    productoExistente.setCantidadStock(productoDetalles.getCantidadStock());
+                }
+                if (productoDetalles.getActivo() != null) {
+                    productoExistente.setActivo(productoDetalles.getActivo());
+                }
                 
                 return productoRepository.save(productoExistente);
             }).orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + id));
