@@ -100,6 +100,8 @@ public class CarritoService {
             item.setCarrito(carrito);
             item.setProducto(producto);
             item.setCantidad(cantidad);
+            // Añadir el nuevo item a la colección en memoria para mantener la consistencia
+            carrito.getItems().add(item);
         }
         
         // Validación de Stock (Importante)
@@ -107,7 +109,7 @@ public class CarritoService {
             throw new IllegalStateException("Stock insuficiente. Solo hay " + producto.getCantidadStock() + " unidades disponibles.");
         }
 
-        ItemCarrito itemGuardado = itemCarritoRepository.save(item);
+        itemCarritoRepository.saveAndFlush(item); // Usar saveAndFlush para forzar la sincronización
 
         // Forzar la recarga del carrito desde la base de datos dentro de la misma transacción
         // para asegurar que la lista de items esté actualizada antes de calcular los totales.
