@@ -70,15 +70,31 @@ public class DireccionService {
         Direccion direccionExistente = direccionRepository.findByIdDireccionAndUsuario_IdUsuario(idDireccion, idUsuario)
             .orElseThrow(() -> new IllegalArgumentException("Dirección no encontrada o no pertenece al usuario: " + idDireccion));
 
-        // Actualizar campos
-        direccionExistente.setNombreDestinatario(detalles.getNombreDestinatario());
-        direccionExistente.setCallePrincipal(detalles.getCallePrincipal());
-        direccionExistente.setNumeroExterior(detalles.getNumeroExterior());
-        direccionExistente.setInformacionAdicional(detalles.getInformacionAdicional());
-        direccionExistente.setCiudad(detalles.getCiudad());
-        direccionExistente.setEstado(detalles.getEstado());
-        direccionExistente.setCodigoPostal(detalles.getCodigoPostal());
-        direccionExistente.setPais(detalles.getPais());
+        // Actualizar campos solo si se proporcionan (no son null)
+        if (detalles.getNombreDestinatario() != null) {
+            direccionExistente.setNombreDestinatario(detalles.getNombreDestinatario());
+        }
+        if (detalles.getCallePrincipal() != null) {
+            direccionExistente.setCallePrincipal(detalles.getCallePrincipal());
+        }
+        if (detalles.getNumeroExterior() != null) {
+            direccionExistente.setNumeroExterior(detalles.getNumeroExterior());
+        }
+        if (detalles.getInformacionAdicional() != null) {
+            direccionExistente.setInformacionAdicional(detalles.getInformacionAdicional());
+        }
+        if (detalles.getCiudad() != null) {
+            direccionExistente.setCiudad(detalles.getCiudad());
+        }
+        if (detalles.getEstado() != null) {
+            direccionExistente.setEstado(detalles.getEstado());
+        }
+        if (detalles.getCodigoPostal() != null) {
+            direccionExistente.setCodigoPostal(detalles.getCodigoPostal());
+        }
+        if (detalles.getPais() != null) {
+            direccionExistente.setPais(detalles.getPais());
+        }
 
         // Si se intenta cambiar el estado de 'principal'
         if (detalles.getPrincipalEnvio() != null) {
