@@ -1,10 +1,13 @@
 package com.myapp.util.config;
 
 import org.springframework.context.annotation.Bean;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,6 +21,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.myapp.util.security.CustomUserDetailsService;
 import com.myapp.util.security.jwt.JwtAuthenticationFilter;
@@ -60,13 +66,22 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(); // BCrypt es el estándar de la industria
     }
 
+    // --- AQUÍ ESTÁ LA SOLUCIÓN DEL CORS ---
     @Bean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        // Configura Jackson para ser más flexible con el Content-Type,
-        // o maneja el charset de forma explícita.
-        // Aunque el problema principal es la serialización, esto ayuda con el warning.
-        return converter;
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Permite cualquier origen (Flutter Web localhost:puerto)
+        configuration.setAllowedOriginPatterns(List.of("*")); 
+        // Permite los métodos necesarios
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Permite los headers, ESPECIALMENTE 'Authorization'
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        // Permite credenciales (cookies/tokens)
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     // Define la cadena de filtros de seguridad
@@ -75,6 +90,8 @@ public class SecurityConfig {
             throws Exception {
 
         http
+
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Habilita CORS con la configuración definida
                 .csrf(csrf -> csrf.disable()) // Deshabilita CSRF para APIs REST sin estado (Stateless)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
