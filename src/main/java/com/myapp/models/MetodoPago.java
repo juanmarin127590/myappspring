@@ -1,5 +1,7 @@
 package com.myapp.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +13,7 @@ import lombok.Data;
 @Entity
 @Table(name = "metodos_pago")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class MetodoPago {
 
     @Id

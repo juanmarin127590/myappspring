@@ -15,6 +15,7 @@ import lombok.Data;
 @Entity
 @Table(name = "direcciones")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Direccion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
