@@ -15,6 +15,7 @@ import lombok.Getter;
 public class CustomUserDetails implements UserDetails {
     
     private final Long idUsuario;
+    private final String nombre;
     private final String email;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
@@ -22,6 +23,7 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(Usuario usuario) {
         this.idUsuario = usuario.getIdUsuario();
+        this.nombre = usuario.getNombre();
         this.email = usuario.getEmail();
         this.password = usuario.getPassword();
         this.activo = usuario.getActivo();
