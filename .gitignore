@@ -1,42 +1,46 @@
-target/
+# Archivos de configuración local y secretos
+# Es una buena práctica tener un archivo de ejemplo (ej. application-template.yml)
+# y que cada desarrollador cree su `application.properties` o `application.yml` local.
+application.properties
+application.yml
 
-.mvn/
-.idea/
-*.iml
+# Logs
 *.log
 logs/
-tmp/
-.DS_Store
-.vscode/
-!src/main/resources/.gitkeep
-!src/test/resources/.gitkeep
 
-### STS ###
+### Maven ###
+target/
+.mvn/
+
+### IDEs y Editores ###
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+.history
+
+# STS / Eclipse
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
-
-### VS Code ###
-.vscode/
-
-### Mac OS ###
-.DS_Store
-.history
-
-### Eclipse ###
 .metadata
 bin/
-tmp/
-.settings/
 
-### Node.js ###
+### Node.js (si se usa para el frontend) ###
 node_modules/
 npm-debug.log
 yarn-error.log
 
-### Maven ###
-target/
+### Archivos temporales y de SO ###
+tmp/
+.DS_Store
+
+# Mantener directorios vacíos en Git
+!src/main/resources/.gitkeep
+!src/test/resources/.gitkeep
