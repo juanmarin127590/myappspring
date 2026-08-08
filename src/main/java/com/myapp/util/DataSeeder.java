@@ -62,21 +62,20 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void createAdminUser(Rol adminRol) {
-        if (usuarioRepository.findByEmail("admin@connectshop.com") == null) {
-           Usuario admin = new Usuario();
+        Usuario admin = usuarioRepository.findByEmail("admin@connectshop.com");
+        if (admin == null) {
+            admin = new Usuario();
             admin.setNombre("Super");
             admin.setApellidos("Admin");
             admin.setEmail("admin@connectshop.com");
-            admin.setPassword(passwordEncoder.encode("adminpass123")); // ¡IMPORTANTE! Hasheando la contraseña antes de guardarla
             admin.setTelefono("1234567890");
-
-            // Asignar el rol de administrador
-            Set<Rol> adminRoles = new HashSet<>(Collections.singleton(adminRol));
-            admin.setRoles(adminRoles);
-
-            usuarioRepository.save(admin);
-            System.out.println("Usuario Administrador 'admin@connectshop.com' creado.");
-            
         }
+        admin.setPassword(passwordEncoder.encode("adminpass123")); // Garantiza hash BCrypt válido
+        Set<Rol> adminRoles = new HashSet<>(Collections.singleton(adminRol));
+        admin.setRoles(adminRoles);
+        admin.setActivo(true);
+
+        usuarioRepository.save(admin);
+        System.out.println("Usuario Administrador 'admin@connectshop.com' listo.");
     }
 }
